@@ -29,8 +29,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     //agregar libreria para solicitud de permisos, versiones de android 6.0 o mas, para las
     //anteriores no aplica
     compile 'com.github.karanchuri:PermissionManager:0.1.0'
+    //agregarla libreria de arcGis
+    implementation 'com.esri.arcgisruntime:arcgis-android:100.2.0'
 }

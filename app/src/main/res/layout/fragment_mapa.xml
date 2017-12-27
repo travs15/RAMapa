@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     tools:context="com.esri.alejo.ramapa.fragmentMapa">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.esri.arcgisruntime.mapping.view.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Fragment del mapa" />
+        android:layout_height="match_parent" >
+    </com.esri.arcgisruntime.mapping.view.MapView>
 
 </FrameLayout>
