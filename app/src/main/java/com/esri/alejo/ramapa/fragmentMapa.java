@@ -41,8 +41,8 @@ public class fragmentMapa extends Fragment {
 
     @Override
     public void onPause() {
-        vistaMap.pause();
         super.onPause();
+        vistaMap.pause();
     }
 
     @Override
