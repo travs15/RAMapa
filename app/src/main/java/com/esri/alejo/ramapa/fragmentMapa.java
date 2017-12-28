@@ -15,7 +15,7 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class fragmentMapa extends Fragment {
+public class fragmentMapa extends Fragment implements View.OnClickListener {
     private MapView vistaMap;
     private View view;
 
@@ -49,5 +49,10 @@ public class fragmentMapa extends Fragment {
     public void onResume() {
         super.onResume();
         vistaMap.resume();
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

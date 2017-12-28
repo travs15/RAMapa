@@ -25,13 +25,14 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="50dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_gravity="right"
         android:layout_marginRight="5dp"
         android:layout_weight="1"
-        app:srcCompat="@mipmap/banner_logo_esri" />
+        app:srcCompat="@mipmap/logo_blanco_esri" />
 
 </RelativeLayout>
