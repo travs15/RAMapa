@@ -3,6 +3,7 @@ package com.esri.alejo.ramapa;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.karan.churi.PermissionManager.PermissionManager;
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "app RAmap";
     PermissionManager permissionManager;
-        TextView txtGranted,txtDenied;
+    TextView txtGranted,txtDenied;
     private ActionBar actionBar;
     public static TextView globalBarText;
     public Activity main;
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    fragmentMapa fragMapa;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionManager.checkResult(requestCode,permissions,grantResults);
-
+        /*para hacer un arreglo de los permisos concedidos y lo que no
         ArrayList<String> grantedPermissions = permissionManager.getStatus().get(0).granted;
         ArrayList<String> deniedPermissions = permissionManager.getStatus().get(0).denied;
 
@@ -114,6 +118,11 @@ public class MainActivity extends AppCompatActivity {
         }
         for(String item:deniedPermissions){
             txtDenied.setText(txtDenied.getText()+"\n"+item);
+        }*/
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            fragMapa.locationDisplay.startAsync();
+        } else {
+            Toast.makeText(fragMapa.view.getContext(), "locacion denegada", Toast.LENGTH_SHORT).show();
         }
     }
 
