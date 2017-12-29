@@ -8,4 +8,6 @@
 
 
     <string name="URL_mapa_alrededores">http://industry-esri-co.maps.arcgis.com/home/webmap/viewer.html?webmap=65e9f1658b0747b2ae2caeb622177580</string>
+
+    <string name="map_search_placeholder">Ejemplo,  calle 90 13 40 Bogotá</string>
 </resources>
