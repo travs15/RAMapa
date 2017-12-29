@@ -84,11 +84,11 @@
                     <ImageButton
                         android:id="@+id/myLocationButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="10dp"
                         android:layout_marginLeft="10dp"
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="10dp"
-                        android:background="@color/colorPrimary"
+                        android:background="@color/colorLocationButton"
                         android:onClick="onClick"
                         android:src="@drawable/mapa_ubicacion" />
                 </LinearLayout>

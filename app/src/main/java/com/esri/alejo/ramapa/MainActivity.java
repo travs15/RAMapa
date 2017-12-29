@@ -3,6 +3,7 @@ package com.esri.alejo.ramapa;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,12 +28,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "app RAmap";
     PermissionManager permissionManager;
-    TextView txtGranted,txtDenied;
     private ActionBar actionBar;
     public static TextView globalBarText;
     public Activity main;
     private BottomNavigationView navigation;
     int colorGeneral, colorPe, colorSel;
+    fragmentMapa fragMapa;
 
 
     @Override
@@ -51,12 +52,7 @@ public class MainActivity extends AppCompatActivity {
         colorGeneral = ContextCompat.getColor(main, R.color.color_general);
         //colorPe = ContextCompat.getColor(main, R.color.colorPrimaryPE);
 
-        globalBarText.setText("Inicio");
 
-        //referenencia a los textos para ver los permisos
-        txtGranted = (TextView) findViewById(R.id.txtGranted);
-        txtDenied = (TextView) findViewById(R.id.txtDenied);
-        //uso del permission manager, de la libreria descargada
         permissionManager = new PermissionManager() {};
         permissionManager.checkAndRequestPermissions(this);
 
@@ -73,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    fragmentMapa fragMapa;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {

@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:gravity="center_horizontal"
+            android:gravity="left"
             android:text="my Title"
             android:textColor="#ffffff"
             android:textSize="18sp" />

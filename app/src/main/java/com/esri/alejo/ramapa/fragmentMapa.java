@@ -37,12 +37,10 @@ import com.esri.arcgisruntime.mapping.view.WrapAroundMode;
 public class fragmentMapa extends Fragment implements View.OnClickListener {
     private MapView vistaMap;
     ArcGISMap map;
-    private View view;
+    public View view;
     private LinearLayout contentProgress, contentProgressSearch, popup;
     private RelativeLayout contentMap;
     private ImageButton locate;
-
-    private LocationDisplay mLocationDisplay;
 
     private int requestCode = 2;
     String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
@@ -67,11 +65,6 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         initRecursos();
         crearMapa();
-
-        //initLocation();
-        //initSearch();
-
-
         geoLocalizacion();
         return view;
     }
@@ -81,6 +74,7 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         vistaMap = (MapView) view.findViewById(R.id.mapView);
         vistaMap.setAttributionTextVisible(false);
         map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.673, -74.051, 12);
+        vistaMap.setMap(map);
 
         map.addLoadStatusChangedListener(new LoadStatusChangedListener() {
             @Override
@@ -102,7 +96,6 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
 
         ArcGISMap map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100,  -74.0817500, 16);
 
-        vistaMap.setMap(map);
         vistaMap.setWrapAroundMode(WrapAroundMode.DISABLED);
 
         //vistaMap.setMap(map);
@@ -114,7 +107,7 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         contentMap = (RelativeLayout) view.findViewById(R.id.contentMap);
 
         locate = (ImageButton) view.findViewById(R.id.myLocationButton);
-       // locate.setOnClickListener(this);
+        locate.setOnClickListener(this);
 
     }
 
@@ -134,33 +127,20 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
     private void geoLocalizacion() {
         try {
             locationDisplay.addDataSourceStatusChangedListener(new LocationDisplay.DataSourceStatusChangedListener() {
+            @Override
+            public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
 
-                @Override
-                public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
+                if (dataSourceStatusChangedEvent.isStarted())
+                    return;
 
-                    if (dataSourceStatusChangedEvent.isStarted())
-                        return;
-
-                    if (dataSourceStatusChangedEvent.getError() == null)
-                        return;
-
-                    boolean permissionCheck1 = ContextCompat.checkSelfPermission(view.getContext(), reqPermissions[0]) ==
-                            PackageManager.PERMISSION_GRANTED;
-                    boolean permissionCheck2 = ContextCompat.checkSelfPermission(view.getContext(), reqPermissions[1]) ==
-                            PackageManager.PERMISSION_GRANTED;
-
-                    if (!(permissionCheck1 && permissionCheck2)) {
-                        ActivityCompat.requestPermissions((Activity) view.getContext(), reqPermissions, requestCode);
-                    } else {
-                        String message = "No has activado la localización de tu celular";
-                        Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
-                    }
+                if (dataSourceStatusChangedEvent.getError() == null)
+                    return;
                 }
-            });
-            mLocationDisplay.startAsync();
-        }catch (Exception e){
-
-        }
+             });
+            locationDisplay.startAsync();
+            } catch (Exception e) {
+                Toast.makeText(view.getContext(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
+            }
     }
 
     @Override
@@ -168,8 +148,8 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.myLocationButton:
                 Toast.makeText(view.getContext(), "funciona",Toast.LENGTH_LONG).show();
-               // mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
-                // mLocationDisplay.startAsync();
+                locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+                //locationDisplay.startAsync();
                 break;
 
         }
