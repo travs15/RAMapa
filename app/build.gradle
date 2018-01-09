@@ -34,4 +34,6 @@ dependencies {
     compile 'com.github.karanchuri:PermissionManager:0.1.0'
     //agregarla libreria de arcGis
     implementation 'com.esri.arcgisruntime:arcgis-android:100.2.0'
+
+    compile 'com.koushikdutta.ion:ion:2.+'
 }
