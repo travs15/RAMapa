@@ -85,12 +85,12 @@ public class MainActivity extends AppCompatActivity {
                     fragManager.beginTransaction().replace(R.id.fragment_default,fragMAp).commit();
                     globalBarText.setText("Mapa");
                     return true;
-                case R.id.navigation_ar:
-                    //mTextMessage.setText(R.string.title_dashboard);
+                case R.id.navigation_ins:
+                    //mTextMessage.setTet(R.string.title_dashboard);
                     setTitle("Map");
-                    FragmentAR fragAR = new FragmentAR();
-                    fragManager.beginTransaction().replace(R.id.fragment_default,fragAR).commit();
-                    globalBarText.setText("A.R.");
+                    FragmentInstructions fragIns = new FragmentInstructions();
+                    fragManager.beginTransaction().replace(R.id.fragment_default,fragIns).commit();
+                    globalBarText.setText("Instrucciones");
                     return true;
             }
             return false;

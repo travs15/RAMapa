@@ -7,8 +7,8 @@
         android:title="@string/title_map" />
 
     <item
-        android:id="@+id/navigation_ar"
+        android:id="@+id/navigation_ins"
         android:icon="@drawable/img_btn_planeta_esri"
-        android:title="@string/title_ar" />
+        android:title="@string/title_ins" />
 
 </menu>

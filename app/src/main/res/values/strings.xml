@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">RAMapa</string>
     <string name="title_map">Mapa</string>
-    <string name="title_ar">A.R.</string>
+    <string name="title_ins">Instrucciones</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
 
     <string name="URL_mapa_alrededores">http://industry-esri-co.maps.arcgis.com/home/webmap/viewer.html?webmap=65e9f1658b0747b2ae2caeb622177580</string>
 

@@ -53,7 +53,7 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
     private MapView vistaMap;
     ArcGISMap map;
     public View view;
-    private LinearLayout contentProgress, contentProgressSearch, popup;
+    private LinearLayout contentProgress, contentProgressSearch, popup,layersFilter;
     private RelativeLayout contentMap;
     private ImageButton locate;
 
@@ -190,6 +190,8 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         locate = (ImageButton) view.findViewById(R.id.myLocationButton);
         locate.setOnClickListener(this);
 
+        layersFilter= (LinearLayout) view.findViewById(R.id.first);
+
         btnParqueaderos = (ImageButton) view.findViewById(R.id.botonParqueaderos);
         btnParqueaderos.setSelected(true);
         btnParqueaderos.setOnClickListener(this);
@@ -266,7 +268,6 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
             case R.id.closePopup:
                 popup.setVisibility(View.GONE);
                 break;
-
         }
 
     }

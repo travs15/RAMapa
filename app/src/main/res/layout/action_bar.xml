@@ -13,10 +13,11 @@
 
         <TextView
             android:id="@+id/actionBarText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:gravity="left"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="20dp"
             android:text="my Title"
             android:textColor="#ffffff"
             android:textSize="18sp" />

@@ -1,0 +1,68 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.esri.alejo.ramapa.FragmentInstructions">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bienvenido a la aplicación desarrollada por integrantes del semillero de innovación geográfica de Esri"
+            android:textSize="18dp"
+            android:textStyle="normal"
+            android:textAlignment="center"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descripción:"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textSize="18dp"
+            android:text="Toca la pestaña de -Mapa- para navegar y ver diferentes lugares de interés" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textSize="18dp"
+            android:text="Al tocar un lugar podrás filtrar los lugares que deseas ver por categoria ademas de una breve descripción del lugar donde se incluye nombre, dirección y una foto" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Realidad Aumentada:"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textSize="18dp"
+            android:text="En la descripción del lugar habrá un botón con una cámara, esta permitirá usar tu cámara para que puedas ver en que lugar se encuentra el lugar que has escogido" />
+    </LinearLayout>
+
+</FrameLayout>
