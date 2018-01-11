@@ -4,9 +4,10 @@
     <string name="title_ins">Instrucciones</string>
 
     <!-- TODO: Remove or change this placeholder text -->
+    <!-- http://industry-esri-co.maps.arcgis.com/home/webmap/viewer.html?webmap=65e9f1658b0747b2ae2caeb622177580 -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="URL_mapa_alrededores">http://industry-esri-co.maps.arcgis.com/home/webmap/viewer.html?webmap=65e9f1658b0747b2ae2caeb622177580</string>
+        <string name="URL_mapa_alrededores">http://industry-esri-co.maps.arcgis.com/home/webmap/viewer.html?webmap=a8410481de324757aaf6ebb79aa501e2</string>
 
     <string name="map_search_placeholder">Ejemplo,  calle 90 13 40 Bogotá</string>
 </resources>

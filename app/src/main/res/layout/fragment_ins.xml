@@ -6,63 +6,94 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-
-    <LinearLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView"
+        android:paddingBottom="50dp">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Bienvenido a la aplicación desarrollada por integrantes del semillero de innovación geográfica de Esri"
-            android:textSize="18dp"
-            android:textStyle="normal"
-            android:textAlignment="center"
-            android:padding="5dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Descripción:"
-            android:textStyle="bold"
-            android:textSize="18dp"
-            android:padding="5dp"/>
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bienvenido a la aplicación desarrollada por integrantes del Semillero de Innovación Geográfica de Esri, Colombia"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:padding="5dp"/>
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="18dp"
-            android:text="Toca la pestaña de -Mapa- para navegar y ver diferentes lugares de interés" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripción:"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:padding="5dp"/>
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="18dp"
-            android:text="Al tocar un lugar podrás filtrar los lugares que deseas ver por categoria ademas de una breve descripción del lugar donde se incluye nombre, dirección y una foto" />
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="18dp"
+                android:text="Toca la pestaña de -Mapa- para navegar y ver diferentes lugares de interés." />
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Realidad Aumentada:"
-            android:textStyle="bold"
-            android:textSize="18dp"
-            android:padding="5dp"/>
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="18dp"
+                android:text="Al tocar un lugar podrás filtrar los lugares que deseas ver por categoria ademas de una breve descripción del lugar donde se incluye nombre, dirección y una foto." />
 
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="18dp"
-            android:text="En la descripción del lugar habrá un botón con una cámara, esta permitirá usar tu cámara para que puedas ver en que lugar se encuentra el lugar que has escogido" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Realidad Aumentada:"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:padding="5dp"/>
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="En la descripción del lugar habrá un botón con una cámara, esta permitirá usar tu cámara para que puedas ver en que lugar se encuentra el lugar que has escogido."
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Soporte:"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:padding="5dp"/>
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="18dp"
+                android:text="Apreciamos tus opiniones y sugerencias, como también si quieres reportar algún error al siguiente correo:" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="semillero@esri.co"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:padding="5dp"
+                android:textAlignment="center"/>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </FrameLayout>

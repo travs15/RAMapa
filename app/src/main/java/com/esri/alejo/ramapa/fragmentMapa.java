@@ -291,19 +291,19 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         switch (content.getName()){
             case "Hoteles":
                 nombre = (String) feature.getAttributes().get("Hotel");
-                direccion = (String) feature.getAttributes().get("Dirección");
+                direccion = (String) feature.getAttributes().get("Direccion");
                 foto = (String) feature.getAttributes().get("Foto");
                 mostrarPopup("Hotel", nombre, direccion, foto);
                 break;
             case "Parqueaderos":
                 nombre = (String) feature.getAttributes().get("Nombre");
-                direccion = (String) feature.getAttributes().get("Dirección");
+                direccion = (String) feature.getAttributes().get("Direccion");
                 foto = (String) feature.getAttributes().get("Foto");
                 mostrarPopup("Parqueadero", nombre, direccion, foto);
                 break;
             case "Restaurantes":
                 nombre = (String) feature.getAttributes().get("Restaurante");
-                direccion = (String) feature.getAttributes().get("Dirección");
+                direccion = (String) feature.getAttributes().get("Direccion");
                 foto = (String) feature.getAttributes().get("Foto");
                 mostrarPopup("Restaurante", nombre, direccion, foto);
                 break;
