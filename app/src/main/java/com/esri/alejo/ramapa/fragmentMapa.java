@@ -4,6 +4,7 @@ package com.esri.alejo.ramapa;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -58,16 +60,15 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
     private ImageButton locate;
 
     private FeatureLayer restaurantes, parqueaderos, hoteles;
-    private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup;
+    private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup, btnAr;
     private TextView categoria, nombreLugar, direccionLugar;
     private ImageView fotoLugar;
-
+    public com.esri.alejo.ramapa.MainActivity mainAct;
 
 
     private int requestCode = 2;
     String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
             .ACCESS_COARSE_LOCATION};
-
 
     //Uso para localizacion
     public LocationDisplay locationDisplay;
@@ -204,6 +205,9 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         btnRestaurantes.setSelected(true);
         btnRestaurantes.setOnClickListener(this);
 
+        btnAr = (ImageButton) view.findViewById(R.id.btnAumentedR);
+        btnAr.setOnClickListener(this);
+
         popup = (LinearLayout) view.findViewById(R.id.contentPopup);
         categoria = (TextView) view.findViewById(R.id.categoria);
         nombreLugar = (TextView) view.findViewById(R.id.lugar);
@@ -255,7 +259,6 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
                 locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
                 locationDisplay.startAsync();
                 break;
-
             case R.id.botonParqueaderos:
                 activarDesactivaLayer(parqueaderos, btnParqueaderos);
                 break;
@@ -267,6 +270,11 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
                 break;
             case R.id.closePopup:
                 popup.setVisibility(View.GONE);
+                break;
+            case R.id.btnAumentedR:
+                Toast.makeText(v.getContext(), "activity ar",Toast.LENGTH_LONG).show();
+                Intent actAr = new Intent(this.getActivity(), ARActivity.class);
+                startActivity(actAr);
                 break;
         }
 

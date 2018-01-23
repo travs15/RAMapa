@@ -5,6 +5,11 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -24,6 +29,10 @@ allprojects {
         }
         maven{
             url 'https://esri.bintray.com/arcgis'
+        }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
         }
     }
 }
