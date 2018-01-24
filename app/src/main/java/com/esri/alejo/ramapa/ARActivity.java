@@ -174,14 +174,12 @@ public class ARActivity extends AppCompatActivity
 
     private void initCamera() {
         int numCams = Camera.getNumberOfCameras();
-        Toast.makeText(this, "numero camaras" + numCams, Toast.LENGTH_LONG).show();
         if(numCams > 0){
             try{
                 camera = Camera.open();
                 camera.startPreview();
                 arCamera.setCamera(camera);
             } catch (RuntimeException ex){
-                Toast.makeText(this, "ERROR:" + ex, Toast.LENGTH_LONG).show();
                 Toast.makeText(this, "Camera not found", Toast.LENGTH_LONG).show();
             }
         }

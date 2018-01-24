@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera"/>
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -30,13 +32,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:allowBackup="true"
             android:name=".ARActivity"
+            android:allowBackup="true"
             android:label="@string/title_activity_ar"
+            android:screenOrientation="userPortrait"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="userPortrait">
-
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
