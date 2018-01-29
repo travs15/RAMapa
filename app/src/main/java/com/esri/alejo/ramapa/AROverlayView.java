@@ -20,6 +20,7 @@ public class AROverlayView extends View {
     private float[] rotatedProjectionMatrix = new float[16];
     private Location currentLocation;
     private List<ARPoint> arPoints;
+    private double rangoVision = 2000;
 
 
     public AROverlayView(Context context) {
@@ -29,7 +30,7 @@ public class AROverlayView extends View {
 
         //Demo points
         arPoints = new ArrayList<ARPoint>() {{
-            add(new ARPoint("Ed. Cerca", 4.674207, -74.052426, 2599));
+            add(new ARPoint("Ed. Cerca", 4.657166, -74.092469, 2599));
             add(new ARPoint("P. virrey", 4.674178, -74.056095, 2600));
             add(new ARPoint("Subway", 4.673248, -74.051376, 2600));
         }};
@@ -53,11 +54,11 @@ public class AROverlayView extends View {
             return;
         }
 
-        final int radius = 30;
+        final int radius = 20;
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+        paint.setColor(Color.BLUE);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.NORMAL));
         paint.setTextSize(60);
 
         for (int i = 0; i < arPoints.size(); i ++) {
@@ -65,7 +66,7 @@ public class AROverlayView extends View {
             float[] pointInECEF = LocationHelper.WSG84toECEF(arPoints.get(i).getLocation());
             float[] pointInENU = LocationHelper.ECEFtoENU(currentLocation, currentLocationInECEF, pointInECEF);
 
-            float[] cameraCoordinateVector = new float[4];
+            float[] cameraCoordinateVector = new float[8];
             Matrix.multiplyMV(cameraCoordinateVector, 0, rotatedProjectionMatrix, 0, pointInENU, 0);
 
             // cameraCoordinateVector[2] is z, that always less than 0 to display on right position

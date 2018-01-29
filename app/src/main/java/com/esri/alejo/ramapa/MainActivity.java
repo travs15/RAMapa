@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity{
 
     @SuppressLint("RestrictedApi")
     private void disableShiftingModeOfBottomNavigationView(BottomNavigationView btmNavigationView) {
-        BottomNavigationMenuView menuView = (BottomNavigationMenuView) btmNavigationView.getChildAt(0);
+        BottomNavigationMenuView menuView = (BottomNavigationMenuView) btmNavigationView.getChildAt(1);
         try {
             Field shiftingMode = menuView.getClass().getDeclaredField("mShiftingMode");
             shiftingMode.setAccessible(true);

@@ -28,5 +28,19 @@
         android:textColor="@android:color/white"
         android:text="@string/gps_loading_text" />
 
+    <RelativeLayout
+        android:id="@+id/layout_miniMap"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_gravity="bottom|right">
+
+        <com.esri.arcgisruntime.mapping.view.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
 
 </FrameLayout>

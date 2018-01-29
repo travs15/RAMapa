@@ -96,8 +96,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/mapView"
-                android:layout_alignRight="@+id/mapView"
+                android:layout_alignBottom="@+id/mapViewLittle"
+                android:layout_alignRight="@+id/mapViewLittle"
                 android:layout_alignWithParentIfMissing="false"
                 android:gravity="bottom|center_horizontal">
                 <!-- ACA VAN los popups, y el activador de capas-->

@@ -2,20 +2,15 @@ package com.esri.alejo.ramapa;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,18 +47,16 @@ import java.util.concurrent.ExecutionException;
  * A simple {@link Fragment} subclass.
  */
 public class fragmentMapa extends Fragment implements View.OnClickListener {
-    private MapView vistaMap;
-    ArcGISMap map;
+    public MapView vistaMap;
+    public ArcGISMap map;
     public View view;
     private LinearLayout contentProgress, contentProgressSearch, popup,layersFilter;
     private RelativeLayout contentMap;
-    private ImageButton locate;
 
     private FeatureLayer restaurantes, parqueaderos, hoteles;
-    private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup, btnAr;
+    private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup, btnAr,locate;
     private TextView categoria, nombreLugar, direccionLugar;
     private ImageView fotoLugar;
-    public com.esri.alejo.ramapa.MainActivity mainAct;
 
 
     private int requestCode = 2;
@@ -77,6 +70,8 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
     public fragmentMapa() {
         // Required empty public constructor
     }
+
+
 
 
     @Override
@@ -96,8 +91,8 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
 
         vistaMap = (MapView) view.findViewById(R.id.mapView);
         vistaMap.setAttributionTextVisible(false);
+        map = new ArcGISMap(this.getResources().getString(R.string.URL_mapa_alrededores));
         //map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.673, -74.051, 12);
-        map = new ArcGISMap(getActivity().getResources().getString(R.string.URL_mapa_alrededores));
         vistaMap.setMap(map);
 
         map.addLoadStatusChangedListener(new LoadStatusChangedListener() {
@@ -116,6 +111,7 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
 
                         if(!layers.isEmpty()){
                             parqueaderos = (FeatureLayer) layers.get(0);
+                            parqueaderos.getFeatureTable().getFields().listIterator(0);
                             restaurantes = (FeatureLayer) layers.get(1);
                             hoteles = (FeatureLayer) layers.get(2);
                         }
@@ -125,10 +121,9 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
         });
 
         vistaMap.setOnTouchListener(new IdentifyFeatureLayerTouchListener(view.getContext(), vistaMap));
-
         vistaMap.setBackgroundGrid(new BackgroundGrid(Color.WHITE, Color.WHITE, 0, vistaMap.getBackgroundGrid().getGridSize()));
 
-        ArcGISMap map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100,  -74.0817500, 16);
+        //ArcGISMap map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.6097100,  -74.0817500, 16);
 
         vistaMap.setWrapAroundMode(WrapAroundMode.DISABLED);
 
@@ -277,7 +272,6 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
                 startActivity(actAr);
                 break;
         }
-
     }
 
     private void mostrarPopup(String categoriaNombre, String nombre, String direccion, String foto){

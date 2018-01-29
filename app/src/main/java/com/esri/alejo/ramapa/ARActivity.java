@@ -1,7 +1,11 @@
 package com.esri.alejo.ramapa;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +17,7 @@ import android.location.LocationManager;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -29,8 +34,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
+import com.esri.arcgisruntime.layers.FeatureLayer;
+import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
+import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
+import com.esri.arcgisruntime.mapping.ArcGISMap;
+import com.esri.arcgisruntime.mapping.LayerList;
+import com.esri.arcgisruntime.mapping.view.BackgroundGrid;
+import com.esri.arcgisruntime.mapping.view.LocationDisplay;
+import com.esri.arcgisruntime.mapping.view.MapView;
+import com.esri.arcgisruntime.mapping.view.WrapAroundMode;
 
 
 public class ARActivity extends AppCompatActivity
@@ -52,6 +69,17 @@ public class ARActivity extends AppCompatActivity
     boolean isNetworkEnabled;
     boolean locationServiceAvailable;
     private LocationManager locationManager;
+    private View viewAR;
+
+    private MapView vistaMapLittle;
+    private ArcGISMap mapaLittle;
+
+    public fragmentMapa fragMap;
+    public LocationDisplay locationDisplay;
+    public RelativeLayout contentMap;
+
+    public Handler handler = new Handler();
+
 
     final static String TAG = "ARActivity";
 
@@ -64,32 +92,79 @@ public class ARActivity extends AppCompatActivity
         setContentView(R.layout.activity_ar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ArcGISRuntimeEnvironment.setLicense("runtimelite,1000,rud9088059687,none,HC5X0H4AH4YDXH46C082");
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
+        //geoLocalizacion2();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
-        toggle.syncState();
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        contentMap = (RelativeLayout) this.findViewById(R.id.layout_miniMap);
+
+        //agregar mapa pequeño
+        createLittleMap();
+
         //ar content------------------------------------
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
         cameraContainerLayout = (FrameLayout) findViewById(R.id.camera_container_layout);
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         tvCurrentLocation = (TextView) findViewById(R.id.tv_current_location);
         arOverlayView = new AROverlayView(this);
+        toggle.syncState();
+
     }
+
+    public void createLittleMap(){
+
+        fragMap = new fragmentMapa();
+        vistaMapLittle = this.findViewById(R.id.mapView);
+        mapaLittle = new ArcGISMap(this.getResources().getString(R.string.URL_mapa_alrededores));
+        vistaMapLittle.setMap(mapaLittle);
+        vistaMapLittle.setVisibility(View.VISIBLE);
+        vistaMapLittle.setBackgroundGrid(new BackgroundGrid(Color.WHITE, Color.WHITE, 0, vistaMapLittle.getBackgroundGrid().getGridSize()));
+        vistaMapLittle.setWrapAroundMode(WrapAroundMode.DISABLED);
+        locationDisplay = vistaMapLittle.getLocationDisplay();
+        locationDisplay.startAsync();
+        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+        mapaLittle.addLoadStatusChangedListener(new LoadStatusChangedListener() {
+            @Override
+            public void loadStatusChanged(LoadStatusChangedEvent loadStatusChangedEvent) {
+                String mapLoadStatus;
+                mapLoadStatus = loadStatusChangedEvent.getNewLoadStatus().name();
+                switch (mapLoadStatus) {
+                    case "LOADED":
+                        contentMap.setVisibility(View.VISIBLE);
+                        if(mapaLittle.getInitialViewpoint() != null)
+                            vistaMapLittle.setViewpoint(mapaLittle.getInitialViewpoint());
+                        break;
+                }
+            }
+        });
+    }
+
+    /*private void geoLocalizacion2() {
+        try {
+            locationDisplay.addDataSourceStatusChangedListener(new LocationDisplay.DataSourceStatusChangedListener() {
+                @Override
+                public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
+
+                    if (dataSourceStatusChangedEvent.isStarted())
+                        return;
+
+                    if (dataSourceStatusChangedEvent.getError() == null)
+                        return;
+                }
+            });
+            locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+        } catch (Exception e) {
+            Toast.makeText(vistaMapLittle.getContext(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
+        }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -126,15 +201,19 @@ public class ARActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        initLocationService();
+        requestLocationPermission();
         requestCameraPermission();
         registerSensors();
         initAROverlayView();
+        vistaMapLittle.resume();
+        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
     }
 
     @Override
     public void onPause() {
         releaseCamera();
+        vistaMapLittle.pause();
+        locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
         super.onPause();
     }
 

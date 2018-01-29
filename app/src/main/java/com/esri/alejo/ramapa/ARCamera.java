@@ -80,8 +80,6 @@ public class ARCamera extends ViewGroup implements SurfaceHolder.Callback {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if (changed && getChildCount() > 0) {
             View child = getChildAt(0);
-            //child.findViewById(R.id.content_ar);
-            //Toast.makeText(this, "numero camaras" , Toast.LENGTH_LONG).show();
 
             final int width = right - left;
             final int height = bottom - top;
@@ -207,7 +205,6 @@ public class ARCamera extends ViewGroup implements SurfaceHolder.Callback {
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         if(camera != null) {
-            Toast.makeText(this.getContext(), "changed", Toast.LENGTH_LONG).show();
             this.cameraWidth = width;
             this.cameraHeight = height;
 
