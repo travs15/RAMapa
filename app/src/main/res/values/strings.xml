@@ -19,4 +19,8 @@
 
 
     <string name="gps_loading_text">GPS is loading...</string>
+
+    <!-- MENU CONFIGURACION -->
+    <string name="txt_menu_layer">Administrar capas</string>
+    <string name="txt_menu_title_settings">Configuraciones</string>
 </resources>

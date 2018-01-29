@@ -1,12 +1,13 @@
 package com.esri.alejo.ramapa;
 
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,7 +45,7 @@ import java.util.concurrent.ExecutionException;
 
 
 /**
- * A simple {@link Fragment} subclass.
+     * A simple {@link Fragment} subclass.
  */
 public class fragmentMapa extends Fragment implements View.OnClickListener {
     public MapView vistaMap;
@@ -70,6 +71,9 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
     public fragmentMapa() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
 
 
 

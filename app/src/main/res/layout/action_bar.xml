@@ -17,8 +17,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center_vertical"
+            android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
-            android:text="my Title"
             android:textColor="#ffffff"
             android:textSize="18sp" />
 
