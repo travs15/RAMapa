@@ -1,13 +1,14 @@
 package com.esri.alejo.ramapa;
 
 
-import android.app.Fragment;
+
 import android.app.FragmentManager;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;

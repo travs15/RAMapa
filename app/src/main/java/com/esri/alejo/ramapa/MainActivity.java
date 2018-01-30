@@ -2,7 +2,7 @@ package com.esri.alejo.ramapa;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
+
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ClipData;
@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -37,9 +38,7 @@ public class MainActivity extends AppCompatActivity{
     public Activity main;
     private BottomNavigationView navigation;
     int colorGeneral, colorPe, colorSel;
-    private FragmentManager manager;
-    private  Fragment fragMapa, fragInstrucciones, selected;
-    private fragmentMapa fragMAPA;
+    fragmentMapa fragMapa;
 
 
     @Override
@@ -67,14 +66,6 @@ public class MainActivity extends AppCompatActivity{
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        createFragmentList();
-
-        selected = fragMapa;
-
-        manager = getFragmentManager();
-        manager.beginTransaction().add(R.id.fragment_default, fragMapa).hide(fragMapa).commit();
-        manager.beginTransaction().add(R.id.fragment_default, fragInstrucciones).hide(fragInstrucciones).commit();
-
 
         //navigation.setSelectedItemId(R.id.navigation_ar);
 
@@ -86,11 +77,6 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-    private void createFragmentList() {
-        fragMapa = new fragmentMapa();
-        fragInstrucciones = new FragmentInstructions();
-
-    }
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -104,17 +90,15 @@ public class MainActivity extends AppCompatActivity{
                 case R.id.navigation_mapa:
                     //mTextMessage.setText(R.string.title_home);
                     setTitle("Map");
-                    selectFragment(fragMapa);
-                    //fragmentMapa fragMAp = new fragmentMapa();
-                    //fragManager.beginTransaction().replace(R.id.fragment_default,fragMapa).commit();
+                    fragmentMapa fragMAp = new fragmentMapa();
+                    fragManager.beginTransaction().replace(R.id.fragment_default,fragMAp).commit();
                     globalBarText.setText("Mapa");
                     return true;
                 case R.id.navigation_ins:
                     //mTextMessage.setTet(R.string.title_dashboard);
                     setTitle("Map");
-                    selectFragment(fragInstrucciones);
-                    //FragmentInstructions fragIns = new FragmentInstructions();
-                    //fragManager.beginTransaction().replace(R.id.fragment_default,fragInstrucciones).commit();
+                    FragmentInstructions fragIns = new FragmentInstructions();
+                    fragManager.beginTransaction().replace(R.id.fragment_default,fragIns).commit();
                     globalBarText.setText("Instrucciones");
                     return true;
             }
@@ -122,20 +106,6 @@ public class MainActivity extends AppCompatActivity{
         }
     };
 
-
-    private void selectFragment(Fragment fragment){
-        vaciasPilaFragment();
-
-        FragmentTransaction fragTransaction = getFragmentManager().beginTransaction();
-        fragTransaction.hide(selected).show(fragment).commit();
-        selected = fragment;
-    }
-
-    private void vaciasPilaFragment(){
-        for(int i = 0; i < manager.getBackStackEntryCount(); ++i) {
-            manager.popBackStack();
-        }
-    }
 
     // se sobreeescribe el metodo para poder obtener los permisos que se denegaron o permitieron
     @Override
@@ -152,9 +122,9 @@ public class MainActivity extends AppCompatActivity{
             txtDenied.setText(txtDenied.getText()+"\n"+item);
         }*/
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            fragMAPA.locationDisplay.startAsync();
+            fragMapa.locationDisplay.startAsync();
         } else {
-            Toast.makeText(fragMAPA.view.getContext(), "locacion denegada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragMapa.view.getContext(), "locacion denegada", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -176,23 +146,5 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
             Log.e(TAG, "Unable to change value of shift mode");
         }
-    }
-    @Override
-    protected void onResume() {
-        Log.v("Example", "onResume");
-
-        String action = getIntent().getAction();
-        // Prevent endless loop by adding a unique action, don't restart if action is present
-        if(action == null || !action.equals("Already created")) {
-            Log.v("Example", "Force restart");
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        // Remove the unique action so the next time onResume is called it will restart
-        else
-            getIntent().setAction(null);
-
-        super.onResume();
     }
 }
