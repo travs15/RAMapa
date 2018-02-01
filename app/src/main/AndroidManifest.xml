@@ -35,13 +35,14 @@
             android:allowBackup="true"
             android:label="@string/title_activity_ar"
             android:screenOrientation="userPortrait"
+            android:parentActivityName=".MainActivity"
             android:supportsRtl="true"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.esri.alejo.ramapa.MainActivity">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </meta-data>
         </activity>
     </application>
 
