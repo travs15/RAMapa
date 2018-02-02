@@ -96,7 +96,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/mapView"
+                android:layout_alignTop="@+id/mapView"
                 android:layout_alignRight="@+id/mapView"
                 android:layout_alignWithParentIfMissing="false"
                 android:gravity="bottom|center_horizontal">

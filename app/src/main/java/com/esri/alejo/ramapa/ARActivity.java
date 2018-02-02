@@ -3,6 +3,7 @@ package com.esri.alejo.ramapa;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -22,6 +23,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -39,15 +41,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.data.FeatureQueryResult;
+import com.esri.arcgisruntime.data.QueryParameters;
+import com.esri.arcgisruntime.geometry.GeometryEngine;
+import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.view.BackgroundGrid;
+import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode;
+
+import java.util.concurrent.ExecutionException;
 
 
 public class ARActivity extends AppCompatActivity
@@ -86,6 +96,14 @@ public class ARActivity extends AppCompatActivity
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
     private static final long MIN_TIME_BW_UPDATES = 0;//1000 * 60 * 1; // 1 minute
 
+    private FeatureLayer restaurantes, parqueaderos, hoteles;
+    private LayerList layers;
+    //obtener posicion
+    private Point posicion;
+    private Object[] arregloFeatures;
+
+    public mapaCarga mapa2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +135,9 @@ public class ARActivity extends AppCompatActivity
         arOverlayView = new AROverlayView(this);
         toggle.syncState();
 
+        Intent actAr = getIntent();
+        mapa2 = (mapaCarga) actAr.getSerializableExtra("miMapa");
+
     }
 
     public void createLittleMap(){
@@ -124,6 +145,7 @@ public class ARActivity extends AppCompatActivity
         fragMap = new fragmentMapa();
         vistaMapLittle = this.findViewById(R.id.mapView);
         mapaLittle = new ArcGISMap(this.getResources().getString(R.string.URL_mapa_alrededores));
+        //mapaLittle = mapa2.getMap();
         vistaMapLittle.setMap(mapaLittle);
         vistaMapLittle.setVisibility(View.VISIBLE);
         vistaMapLittle.setBackgroundGrid(new BackgroundGrid(Color.WHITE, Color.WHITE, 0, vistaMapLittle.getBackgroundGrid().getGridSize()));
@@ -131,6 +153,7 @@ public class ARActivity extends AppCompatActivity
         locationDisplay = vistaMapLittle.getLocationDisplay();
         locationDisplay.startAsync();
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+        vistaMapLittle.setOnTouchListener(new IdentifyFeatureLayerTouchListener(vistaMapLittle.getContext(), vistaMapLittle));
         mapaLittle.addLoadStatusChangedListener(new LoadStatusChangedListener() {
             @Override
             public void loadStatusChanged(LoadStatusChangedEvent loadStatusChangedEvent) {
@@ -138,33 +161,48 @@ public class ARActivity extends AppCompatActivity
                 mapLoadStatus = loadStatusChangedEvent.getNewLoadStatus().name();
                 switch (mapLoadStatus) {
                     case "LOADED":
+                        Toast.makeText(vistaMapLittle.getContext(),"Cargado",Toast.LENGTH_LONG).show();
                         contentMap.setVisibility(View.VISIBLE);
-                        if(mapaLittle.getInitialViewpoint() != null)
+                        LayerList layers = mapaLittle.getOperationalLayers();
+                        if(!layers.isEmpty()){
+                            parqueaderos = (FeatureLayer) layers.get(0);
+                            restaurantes = (FeatureLayer) layers.get(1);
+                            hoteles = (FeatureLayer) layers.get(2);
+                        }
+                        if(mapaLittle.getInitialViewpoint() != null){
                             vistaMapLittle.setViewpoint(mapaLittle.getInitialViewpoint());
+                        }
+
                         break;
                 }
             }
         });
     }
 
-    /*private void geoLocalizacion2() {
-        try {
-            locationDisplay.addDataSourceStatusChangedListener(new LocationDisplay.DataSourceStatusChangedListener() {
-                @Override
-                public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
+    private class IdentifyFeatureLayerTouchListener extends DefaultMapViewOnTouchListener {
 
-                    if (dataSourceStatusChangedEvent.isStarted())
-                        return;
+        private FeatureLayer layer = null; // reference to the layer to identify features in
 
-                    if (dataSourceStatusChangedEvent.getError() == null)
-                        return;
-                }
-            });
-            locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
-        } catch (Exception e) {
-            Toast.makeText(vistaMapLittle.getContext(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
+        // provide a default constructor
+        public IdentifyFeatureLayerTouchListener(Context context, MapView mapView) {
+            super(context, mapView);
         }
-    }*/
+
+        // override the onSingleTapConfirmed gesture to handle a single tap on the MapView
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            Toast.makeText(vistaMapLittle.getContext(),"presionado",Toast.LENGTH_LONG).show();
+            /*try {
+                actualizarPunto(location);
+                puntosCapa(parqueaderos);
+            } catch (ExecutionException e1) {
+                e1.printStackTrace();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }*/
+            return super.onSingleTapConfirmed(e);
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -201,11 +239,11 @@ public class ARActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
+        vistaMapLittle.resume();
         requestLocationPermission();
         requestCameraPermission();
         registerSensors();
         initAROverlayView();
-        vistaMapLittle.resume();
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
     }
 
@@ -341,11 +379,40 @@ public class ARActivity extends AppCompatActivity
         }
     }
 
+    //actualizar el punto de la posicion actual para hacer el buffer
+    private void actualizarPunto(Location loc){
+        posicion = new Point(loc.getLatitude(),loc.getLongitude(),loc.getAltitude());
+    }
+
+    public void puntosCapa(FeatureLayer lay) throws ExecutionException, InterruptedException {
+        float radioBuffer = 200;
+        //FeatureQueryResult query = lay.
+        //crear los parametros para el query
+        QueryParameters queryParam = new QueryParameters();
+        //clausula de busqueda
+        queryParam.setWhereClause("1=1");
+        //referencia espacial del query
+        queryParam.setOutSpatialReference(mapaLittle.getSpatialReference());
+        //relacion espacial, o la accion que se quiere realizar, en este caso intersectar
+        queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);
+        //geometria con la que se quiere intersectar o hacer la accion
+        queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));
+        Toast.makeText(vistaMapLittle.getContext(),"buffer hecho", Toast.LENGTH_LONG).show();
+        //arreglo de features que bota la seleccion de features en el feature layer
+        ListenableFuture<FeatureQueryResult> featureQueryResultListenableFuture =
+                lay.selectFeaturesAsync(queryParam, FeatureLayer.SelectionMode.SUBTRACT);
+        Toast.makeText(this, "obtenido", Toast.LENGTH_SHORT).show();
+        arregloFeatures = featureQueryResultListenableFuture.get().getFields().toArray();
+        Toast.makeText(this, "tamaño"+ arregloFeatures[0].toString(), Toast.LENGTH_SHORT).show();
+    }
+
     private void updateLatestLocation() {
         if (arOverlayView !=null && location != null) {
             arOverlayView.updateCurrentLocation(location);
             tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
                     location.getLatitude(), location.getLongitude(), location.getAltitude()));
+            locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+            //actualizarPunto(location);
         }
     }
 

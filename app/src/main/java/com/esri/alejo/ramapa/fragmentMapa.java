@@ -41,6 +41,7 @@ import com.esri.arcgisruntime.mapping.view.WrapAroundMode;
 
 import com.koushikdutta.ion.Ion;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -48,17 +49,19 @@ import java.util.concurrent.ExecutionException;
 /**
      * A simple {@link Fragment} subclass.
  */
-public class fragmentMapa extends Fragment implements View.OnClickListener {
+public class fragmentMapa extends Fragment implements View.OnClickListener,Serializable {
     public MapView vistaMap;
     public ArcGISMap map;
     public View view;
     private LinearLayout contentProgress, contentProgressSearch, popup,layersFilter;
     private RelativeLayout contentMap;
 
-    private FeatureLayer restaurantes, parqueaderos, hoteles;
+    public FeatureLayer restaurantes, parqueaderos, hoteles;
     private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup, btnAr,locate;
     private TextView categoria, nombreLugar, direccionLugar;
     private ImageView fotoLugar;
+
+    public mapaCarga mapaAumented;
 
 
     private int requestCode = 2;
@@ -96,7 +99,9 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
 
         vistaMap = (MapView) view.findViewById(R.id.mapView);
         vistaMap.setAttributionTextVisible(false);
-        map = new ArcGISMap(this.getResources().getString(R.string.URL_mapa_alrededores));
+        mapaAumented = new mapaCarga(this.getResources().getString(R.string.URL_mapa_alrededores));
+        map = mapaAumented.getMap();
+        //map = new ArcGISMap(this.getResources().getString(R.string.URL_mapa_alrededores));
         //map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 4.673, -74.051, 12);
         vistaMap.setMap(map);
 
@@ -114,9 +119,9 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
 
                         LayerList layers = map.getOperationalLayers();
 
+
                         if(!layers.isEmpty()){
                             parqueaderos = (FeatureLayer) layers.get(0);
-                            parqueaderos.getFeatureTable().getFields().listIterator(0);
                             restaurantes = (FeatureLayer) layers.get(1);
                             hoteles = (FeatureLayer) layers.get(2);
                         }
@@ -273,7 +278,8 @@ public class fragmentMapa extends Fragment implements View.OnClickListener {
                 break;
             case R.id.btnAumentedR:
                 Toast.makeText(v.getContext(), "activity ar",Toast.LENGTH_LONG).show();
-                Intent actAr = new Intent(this.getActivity(), ARActivity.class);
+                Intent actAr = new Intent(view.getContext(), ARActivity.class);
+                //actAr.putExtra("miMapa",mapaAumented);
                 startActivity(actAr);
                 break;
         }
