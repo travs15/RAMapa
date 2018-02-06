@@ -32,8 +32,9 @@ public class AROverlayView extends View {
         arPoints = new ArrayList<ARPoint>() {{
             add(new ARPoint("Ed. Cerca", 4.657166, -74.092469, 2599));
             add(new ARPoint("P. virrey", 4.674178, -74.056095, 2600));
-            add(new ARPoint("Subway", 4.673248, -74.051376, 2600));
+            //add(new ARPoint("Subway", 4.673248, -74.051376, 2600));
         }};
+
     }
 
     public void updateRotatedProjectionMatrix(float[] rotatedProjectionMatrix) {
@@ -79,5 +80,9 @@ public class AROverlayView extends View {
                 canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
             }
         }
+    }
+
+    public void agregarArPoints(ARPoint p){
+        arPoints.add(p);
     }
 }

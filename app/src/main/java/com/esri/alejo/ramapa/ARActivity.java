@@ -39,13 +39,20 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+//import com.esri.android.map.Layer
 
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
+import com.esri.arcgisruntime.data.Feature;
 import com.esri.arcgisruntime.data.FeatureQueryResult;
+import com.esri.arcgisruntime.data.FeatureTable;
 import com.esri.arcgisruntime.data.QueryParameters;
+import com.esri.arcgisruntime.data.ServiceFeatureTable;
+import com.esri.arcgisruntime.geometry.Geometry;
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
+import com.esri.arcgisruntime.geometry.SpatialReference;
+import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.layers.FeatureLayer;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
@@ -57,6 +64,9 @@ import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
@@ -88,9 +98,6 @@ public class ARActivity extends AppCompatActivity
     public LocationDisplay locationDisplay;
     public RelativeLayout contentMap;
 
-    public Handler handler = new Handler();
-
-
     final static String TAG = "ARActivity";
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
@@ -102,7 +109,7 @@ public class ARActivity extends AppCompatActivity
     private Point posicion;
     private Object[] arregloFeatures;
 
-    public mapaCarga mapa2;
+    //AROverlayView arOver = new AROverlayView(getBaseContext());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +143,7 @@ public class ARActivity extends AppCompatActivity
         toggle.syncState();
 
         Intent actAr = getIntent();
-        mapa2 = (mapaCarga) actAr.getSerializableExtra("miMapa");
+        //mapa2 = (mapaCarga) actAr.getSerializableExtra("miMapa");
 
     }
 
@@ -194,12 +201,15 @@ public class ARActivity extends AppCompatActivity
             Toast.makeText(vistaMapLittle.getContext(),"presionado",Toast.LENGTH_LONG).show();
             /*try {
                 actualizarPunto(location);
-                puntosCapa(parqueaderos);
+                //puntosCapa(parqueaderos);
             } catch (ExecutionException e1) {
                 e1.printStackTrace();
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }*/
+            actualizarPunto(location);
+            //puntosCapa(parqueaderos);
+            hacerConsulta();
             return super.onSingleTapConfirmed(e);
         }
     }
@@ -381,18 +391,20 @@ public class ARActivity extends AppCompatActivity
 
     //actualizar el punto de la posicion actual para hacer el buffer
     private void actualizarPunto(Location loc){
-        posicion = new Point(loc.getLatitude(),loc.getLongitude(),loc.getAltitude());
+       posicion = new Point(loc.getLatitude(),loc.getLongitude(),loc.getAltitude(), SpatialReferences.getWgs84());
+       Geometry xx = GeometryEngine.project(posicion,mapaLittle.getSpatialReference());
+       posicion = (Point)xx;
     }
 
     public void puntosCapa(FeatureLayer lay) throws ExecutionException, InterruptedException {
-        float radioBuffer = 200;
+        float radioBuffer = 500;
         //FeatureQueryResult query = lay.
         //crear los parametros para el query
         QueryParameters queryParam = new QueryParameters();
         //clausula de busqueda
         queryParam.setWhereClause("1=1");
         //referencia espacial del query
-        queryParam.setOutSpatialReference(mapaLittle.getSpatialReference());
+        queryParam.setOutSpatialReference(SpatialReferences.getWgs84());
         //relacion espacial, o la accion que se quiere realizar, en este caso intersectar
         queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);
         //geometria con la que se quiere intersectar o hacer la accion
@@ -400,11 +412,68 @@ public class ARActivity extends AppCompatActivity
         Toast.makeText(vistaMapLittle.getContext(),"buffer hecho", Toast.LENGTH_LONG).show();
         //arreglo de features que bota la seleccion de features en el feature layer
         ListenableFuture<FeatureQueryResult> featureQueryResultListenableFuture =
-                lay.selectFeaturesAsync(queryParam, FeatureLayer.SelectionMode.SUBTRACT);
-        Toast.makeText(this, "obtenido", Toast.LENGTH_SHORT).show();
+                lay.selectFeaturesAsync(queryParam, FeatureLayer.SelectionMode.NEW);
+        //featureQueryResultListenableFuture.get().
+        Toast.makeText(vistaMapLittle.getContext(), "obtenido", Toast.LENGTH_SHORT).show();
         arregloFeatures = featureQueryResultListenableFuture.get().getFields().toArray();
-        Toast.makeText(this, "tamaño"+ arregloFeatures[0].toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(vistaMapLittle.getContext(), "feature"+ arregloFeatures.length, Toast.LENGTH_SHORT).show();
     }
+
+    public void hacerConsulta() {
+        final ServiceFeatureTable serviceFT = new ServiceFeatureTable(this.getResources().getString(R.string.URL_mapa_alrededores));
+        serviceFT.setFeatureRequestMode(ServiceFeatureTable.FeatureRequestMode.MANUAL_CACHE);
+        serviceFT.loadAsync();
+        //call select features
+        serviceFT.addDoneLoadingListener(new Runnable() {
+            @Override
+            public void run() {
+                float radioBuffer = 500;
+                QueryParameters queryParam = new QueryParameters();
+                //clausula de busqueda
+                queryParam.setWhereClause("1=1");
+                //referencia espacial del query
+                queryParam.setOutSpatialReference(SpatialReferences.getWgs84());
+                //relacion espacial, o la accion que se quiere realizar, en este caso intersectar
+                queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);
+                //geometria con la que se quiere intersectar o hacer la accion
+                queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));
+                queryParam.setReturnGeometry(false);
+                queryParam.getOrderByFields().add(new QueryParameters.OrderBy("nombre",QueryParameters.SortOrder.DESCENDING));
+                // set all outfields
+                List<String> outFields = new ArrayList<>();
+                outFields.add("*");
+                //arreglo de features que bota la seleccion de features en el feature layer
+                final ListenableFuture<FeatureQueryResult> featureQResult = serviceFT.populateFromServiceAsync(queryParam,true,outFields);
+                featureQResult.addDoneListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FeatureQueryResult result = featureQResult.get();
+                            Iterator<Feature> iterator = result.iterator();
+                            Feature feat;
+
+                            ARPoint arPoint = null;
+                            ArrayList<ARPoint> itemPuntos = new ArrayList<>();
+
+                            while(iterator.hasNext()){
+                                feat = iterator.next();
+                                Point punto = (Point) feat.getGeometry();
+                                arPoint =
+                                        new ARPoint(feat.getFeatureTable().getField("nombre").toString(),
+                                                punto.getX(),punto.getY(),punto.getZ());
+                                arOverlayView.agregarArPoints(arPoint);
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
 
     private void updateLatestLocation() {
         if (arOverlayView !=null && location != null) {
