@@ -46,6 +46,7 @@ import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.Feature;
 import com.esri.arcgisruntime.data.FeatureQueryResult;
 import com.esri.arcgisruntime.data.FeatureTable;
+import com.esri.arcgisruntime.data.Field;
 import com.esri.arcgisruntime.data.QueryParameters;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.geometry.Geometry;
@@ -207,9 +208,9 @@ public class ARActivity extends AppCompatActivity
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }*/
-            actualizarPunto(location);
+
             //puntosCapa(parqueaderos);
-            hacerConsulta();
+            hacerConsulta(getResources().getString(R.string.URL_capa_parqueaderos));
             return super.onSingleTapConfirmed(e);
         }
     }
@@ -419,26 +420,27 @@ public class ARActivity extends AppCompatActivity
         Toast.makeText(vistaMapLittle.getContext(), "feature"+ arregloFeatures.length, Toast.LENGTH_SHORT).show();
     }
 
-    public void hacerConsulta() {
-        final ServiceFeatureTable serviceFT = new ServiceFeatureTable(this.getResources().getString(R.string.URL_mapa_alrededores));
+    public void hacerConsulta(String urlCapa) {
+        try{
+        //final ServiceFeatureTable serviceFT = new ServiceFeatureTable(this.getResources().getString(R.string.URL_mapa_alrededores));
+        final ServiceFeatureTable serviceFT = new ServiceFeatureTable(urlCapa);
+        FeatureLayer featureLayerprueba = new FeatureLayer(serviceFT);
+        mapaLittle.getOperationalLayers().add(featureLayerprueba);
         serviceFT.setFeatureRequestMode(ServiceFeatureTable.FeatureRequestMode.MANUAL_CACHE);
         serviceFT.loadAsync();
-        //call select features
         serviceFT.addDoneLoadingListener(new Runnable() {
             @Override
             public void run() {
-                float radioBuffer = 500;
                 QueryParameters queryParam = new QueryParameters();
-                //clausula de busqueda
-                queryParam.setWhereClause("1=1");
-                //referencia espacial del query
-                queryParam.setOutSpatialReference(SpatialReferences.getWgs84());
-                //relacion espacial, o la accion que se quiere realizar, en este caso intersectar
-                queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);
-                //geometria con la que se quiere intersectar o hacer la accion
-                queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));
-                queryParam.setReturnGeometry(false);
                 queryParam.getOrderByFields().add(new QueryParameters.OrderBy("nombre",QueryParameters.SortOrder.DESCENDING));
+                queryParam.setWhereClause("1=1");//clausula de busqueda
+                queryParam.setReturnGeometry(true);
+                queryParam.setOutSpatialReference(SpatialReferences.getWgs84());//referencia espacial del query
+                //queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);//relacion espacial, o la accion que se quiere realizar, en este caso intersectar
+                //float radioBuffer = 500;//radio de buffer
+                //queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));//geometria con la que se quiere intersectar o hacer la accion
+                //final ListenableFuture<FeatureQueryResult> featureQResult = serviceFT.queryFeaturesAsync(queryParam);//todos los features son cargados
+
                 // set all outfields
                 List<String> outFields = new ArrayList<>();
                 outFields.add("*");
@@ -449,18 +451,18 @@ public class ARActivity extends AppCompatActivity
                     public void run() {
                         try {
                             FeatureQueryResult result = featureQResult.get();
+                            List<Field> campos = result.getFields();
+                            Iterator<Field> it = campos.iterator();
                             Iterator<Feature> iterator = result.iterator();
                             Feature feat;
 
                             ARPoint arPoint = null;
-                            ArrayList<ARPoint> itemPuntos = new ArrayList<>();
 
                             while(iterator.hasNext()){
                                 feat = iterator.next();
                                 Point punto = (Point) feat.getGeometry();
-                                arPoint =
-                                        new ARPoint(feat.getFeatureTable().getField("nombre").toString(),
-                                                punto.getX(),punto.getY(),punto.getZ());
+                                arPoint = new ARPoint(feat.getFeatureTable().getField("nombre").toString(),
+                                        punto.getX(),punto.getY(),2600);
                                 arOverlayView.agregarArPoints(arPoint);
                             }
                         } catch (InterruptedException e) {
@@ -470,8 +472,14 @@ public class ARActivity extends AppCompatActivity
                         }
                     }
                 });
+
             }
         });
+
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -481,7 +489,7 @@ public class ARActivity extends AppCompatActivity
             tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
                     location.getLatitude(), location.getLongitude(), location.getAltitude()));
             locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
-            //actualizarPunto(location);
+            actualizarPunto(location);
         }
     }
 
