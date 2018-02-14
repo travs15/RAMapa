@@ -1,6 +1,8 @@
 package com.esri.alejo.ramapa;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -19,7 +21,7 @@ public class AROverlayView extends View {
     Context context;
     private float[] rotatedProjectionMatrix = new float[16];
     private Location currentLocation;
-    private List<ARPoint> arPoints;
+    private List<ARPoint> arPoints = new ArrayList<ARPoint>();
     private double rangoVision = 2000;
 
 
@@ -29,11 +31,11 @@ public class AROverlayView extends View {
         this.context = context;
 
         //Demo points
-        arPoints = new ArrayList<ARPoint>() {{
+        /*arPoints = new ArrayList<ARPoint>() {{
             add(new ARPoint("Ed. Cerca", 4.657166, -74.092469, 2599));
             add(new ARPoint("P. virrey", 4.674178, -74.056095, 2600));
             //add(new ARPoint("Subway", 4.673248, -74.051376, 2600));
-        }};
+        }};*/
 
     }
 
@@ -58,7 +60,7 @@ public class AROverlayView extends View {
         final int radius = 20;
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLUE);
+        paint.setColor(getResources().getColor(R.color.color_parqu_ar));
         paint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.NORMAL));
         paint.setTextSize(60);
 
@@ -75,8 +77,9 @@ public class AROverlayView extends View {
             if (cameraCoordinateVector[2] < 0) {
                 float x  = (0.5f + cameraCoordinateVector[0]/cameraCoordinateVector[3]) * canvas.getWidth();
                 float y = (0.5f - cameraCoordinateVector[1]/cameraCoordinateVector[3]) * canvas.getHeight();
-
-                canvas.drawCircle(x, y, radius, paint);
+                Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.mipmap.pin_parqu_ar1);
+                canvas.drawBitmap(bmp,x- (5*arPoints.get(i).getName().length() / 2),y-70, paint);
+                //canvas.drawCircle(x, y, radius, paint);
                 canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
             }
         }

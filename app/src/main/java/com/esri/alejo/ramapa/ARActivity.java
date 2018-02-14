@@ -158,6 +158,7 @@ public class ARActivity extends AppCompatActivity
         vistaMapLittle.setVisibility(View.VISIBLE);
         vistaMapLittle.setBackgroundGrid(new BackgroundGrid(Color.WHITE, Color.WHITE, 0, vistaMapLittle.getBackgroundGrid().getGridSize()));
         vistaMapLittle.setWrapAroundMode(WrapAroundMode.DISABLED);
+
         locationDisplay = vistaMapLittle.getLocationDisplay();
         locationDisplay.startAsync();
         locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
@@ -165,12 +166,14 @@ public class ARActivity extends AppCompatActivity
         mapaLittle.addLoadStatusChangedListener(new LoadStatusChangedListener() {
             @Override
             public void loadStatusChanged(LoadStatusChangedEvent loadStatusChangedEvent) {
+
                 String mapLoadStatus;
                 mapLoadStatus = loadStatusChangedEvent.getNewLoadStatus().name();
                 switch (mapLoadStatus) {
                     case "LOADED":
                         Toast.makeText(vistaMapLittle.getContext(),"Cargado",Toast.LENGTH_LONG).show();
                         contentMap.setVisibility(View.VISIBLE);
+                        hacerConsulta(getResources().getString(R.string.URL_capa_parqueaderos));
                         LayerList layers = mapaLittle.getOperationalLayers();
                         if(!layers.isEmpty()){
                             parqueaderos = (FeatureLayer) layers.get(0);
@@ -190,7 +193,6 @@ public class ARActivity extends AppCompatActivity
     private class IdentifyFeatureLayerTouchListener extends DefaultMapViewOnTouchListener {
 
         private FeatureLayer layer = null; // reference to the layer to identify features in
-
         // provide a default constructor
         public IdentifyFeatureLayerTouchListener(Context context, MapView mapView) {
             super(context, mapView);
@@ -210,7 +212,7 @@ public class ARActivity extends AppCompatActivity
             }*/
 
             //puntosCapa(parqueaderos);
-            hacerConsulta(getResources().getString(R.string.URL_capa_parqueaderos));
+            //hacerConsulta(getResources().getString(R.string.URL_capa_parqueaderos));
             return super.onSingleTapConfirmed(e);
         }
     }
@@ -393,31 +395,8 @@ public class ARActivity extends AppCompatActivity
     //actualizar el punto de la posicion actual para hacer el buffer
     private void actualizarPunto(Location loc){
        posicion = new Point(loc.getLatitude(),loc.getLongitude(),loc.getAltitude(), SpatialReferences.getWgs84());
-       Geometry xx = GeometryEngine.project(posicion,mapaLittle.getSpatialReference());
-       posicion = (Point)xx;
-    }
-
-    public void puntosCapa(FeatureLayer lay) throws ExecutionException, InterruptedException {
-        float radioBuffer = 500;
-        //FeatureQueryResult query = lay.
-        //crear los parametros para el query
-        QueryParameters queryParam = new QueryParameters();
-        //clausula de busqueda
-        queryParam.setWhereClause("1=1");
-        //referencia espacial del query
-        queryParam.setOutSpatialReference(SpatialReferences.getWgs84());
-        //relacion espacial, o la accion que se quiere realizar, en este caso intersectar
-        queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);
-        //geometria con la que se quiere intersectar o hacer la accion
-        queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));
-        Toast.makeText(vistaMapLittle.getContext(),"buffer hecho", Toast.LENGTH_LONG).show();
-        //arreglo de features que bota la seleccion de features en el feature layer
-        ListenableFuture<FeatureQueryResult> featureQueryResultListenableFuture =
-                lay.selectFeaturesAsync(queryParam, FeatureLayer.SelectionMode.NEW);
-        //featureQueryResultListenableFuture.get().
-        Toast.makeText(vistaMapLittle.getContext(), "obtenido", Toast.LENGTH_SHORT).show();
-        arregloFeatures = featureQueryResultListenableFuture.get().getFields().toArray();
-        Toast.makeText(vistaMapLittle.getContext(), "feature"+ arregloFeatures.length, Toast.LENGTH_SHORT).show();
+       //Geometry xx = GeometryEngine.project(posicion,mapaLittle.getSpatialReference());
+       //posicion = (Point)xx;
     }
 
     public void hacerConsulta(String urlCapa) {
@@ -437,7 +416,7 @@ public class ARActivity extends AppCompatActivity
                 queryParam.setReturnGeometry(true);
                 queryParam.setOutSpatialReference(SpatialReferences.getWgs84());//referencia espacial del query
                 //queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);//relacion espacial, o la accion que se quiere realizar, en este caso intersectar
-                //float radioBuffer = 500;//radio de buffer
+                final float radioBuffer = (float) 300;//radio de buffer
                 //queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));//geometria con la que se quiere intersectar o hacer la accion
                 //final ListenableFuture<FeatureQueryResult> featureQResult = serviceFT.queryFeaturesAsync(queryParam);//todos los features son cargados
 
@@ -451,19 +430,26 @@ public class ARActivity extends AppCompatActivity
                     public void run() {
                         try {
                             FeatureQueryResult result = featureQResult.get();
-                            List<Field> campos = result.getFields();
-                            Iterator<Field> it = campos.iterator();
                             Iterator<Feature> iterator = result.iterator();
                             Feature feat;
 
                             ARPoint arPoint = null;
+                            actualizarPunto(location);
+                            Geometry buffer = GeometryEngine.buffer(posicion,radioBuffer);
 
                             while(iterator.hasNext()){
                                 feat = iterator.next();
                                 Point punto = (Point) feat.getGeometry();
-                                arPoint = new ARPoint(feat.getFeatureTable().getField("nombre").toString(),
-                                        punto.getX(),punto.getY(),2600);
-                                arOverlayView.agregarArPoints(arPoint);
+                                List<Geometry> puntosIntersec = GeometryEngine.intersections(buffer,punto);
+                                Iterator<Geometry> iterPoint = puntosIntersec.iterator();
+                                Point p;
+                                while(iterPoint.hasNext()){
+                                    p=(Point)iterPoint.next();
+                                    GeometryEngine.project(p,mapaLittle.getSpatialReference());
+                                    arPoint = new ARPoint((String) feat.getAttributes().get("nombre"),
+                                            p.getY(),p.getX(),2400);
+                                    arOverlayView.agregarArPoints(arPoint);
+                                }
                             }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -489,7 +475,7 @@ public class ARActivity extends AppCompatActivity
             tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
                     location.getLatitude(), location.getLongitude(), location.getAltitude()));
             locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
-            actualizarPunto(location);
+            //actualizarPunto(location);
         }
     }
 

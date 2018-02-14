@@ -57,9 +57,11 @@ public class fragmentMapa extends Fragment implements View.OnClickListener,Seria
     private RelativeLayout contentMap;
 
     public FeatureLayer restaurantes, parqueaderos, hoteles;
-    private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup, btnAr,locate;
+    private ImageButton btnParqueaderos, btnHoteles, btnRestaurantes, closePopup, btnAr,locate,btnFilter;
     private TextView categoria, nombreLugar, direccionLugar;
     private ImageView fotoLugar;
+
+    public boolean flagPar,flagRestaurantes;
 
     public mapaCarga mapaAumented;
 
@@ -196,6 +198,9 @@ public class fragmentMapa extends Fragment implements View.OnClickListener,Seria
         locate = (ImageButton) view.findViewById(R.id.myLocationButton);
         locate.setOnClickListener(this);
 
+        btnFilter = (ImageButton)view.findViewById(R.id.layersButton);
+        btnFilter.setOnClickListener(this);
+
         layersFilter= (LinearLayout) view.findViewById(R.id.first);
 
         btnParqueaderos = (ImageButton) view.findViewById(R.id.botonParqueaderos);
@@ -260,7 +265,6 @@ public class fragmentMapa extends Fragment implements View.OnClickListener,Seria
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.myLocationButton:
-                Toast.makeText(view.getContext(), "funciona",Toast.LENGTH_LONG).show();
                 locationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
                 locationDisplay.startAsync();
                 break;
@@ -277,10 +281,12 @@ public class fragmentMapa extends Fragment implements View.OnClickListener,Seria
                 popup.setVisibility(View.GONE);
                 break;
             case R.id.btnAumentedR:
-                Toast.makeText(v.getContext(), "activity ar",Toast.LENGTH_LONG).show();
                 Intent actAr = new Intent(view.getContext(), ARActivity.class);
                 //actAr.putExtra("miMapa",mapaAumented);
                 startActivity(actAr);
+                break;
+            case R.id.layersButton:
+                activarFiltroLayers();
                 break;
         }
     }
@@ -333,5 +339,22 @@ public class fragmentMapa extends Fragment implements View.OnClickListener,Seria
                 layer.setVisible(true);
             }
         }
+    }
+
+    private void activarFiltroLayers(){
+        if(btnFilter.isSelected()){
+            btnFilter.setSelected(false);
+            layersFilter.setVisibility(View.GONE);
+        }else{
+            btnFilter.setSelected(true);
+            layersFilter.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void agregarLayer(FeatureLayer featureLayer){
+        map.getOperationalLayers().add(featureLayer);
+        //agregar pin
+        //agregar pin al menu
+        //extender metodo de reconocer capa
     }
 }

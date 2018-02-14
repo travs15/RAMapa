@@ -20,4 +20,6 @@
     <!--Color-->
     <color name="transparent">#00000000</color>
 
+    <color name="color_parqu_ar">#0080FF</color>
+
 </resources>

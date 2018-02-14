@@ -9,6 +9,20 @@
     tools:context="com.esri.alejo.ramapa.ARActivity"
     tools:showIn="@layout/app_bar_ar">
 
+    <RelativeLayout
+        android:id="@+id/layout_miniMap"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_gravity="bottom|right">
+
+        <com.esri.arcgisruntime.mapping.view.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
     <FrameLayout
         android:id="@+id/camera_container_layout"
         android:layout_width="match_parent"
@@ -25,22 +39,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:text="@string/gps_loading_text"
         android:textColor="@android:color/white"
-        android:text="@string/gps_loading_text" />
+        android:visibility="gone" />
 
-    <RelativeLayout
-        android:id="@+id/layout_miniMap"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_gravity="bottom|right">
-
-        <com.esri.arcgisruntime.mapping.view.MapView
-            android:id="@+id/mapView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible" />
-
-    </RelativeLayout>
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:padding="5dp"
+        app:srcCompat="@drawable/logo_blanco_esri" />
 
 
 </FrameLayout>
