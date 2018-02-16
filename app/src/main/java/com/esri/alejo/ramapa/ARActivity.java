@@ -104,11 +104,12 @@ public class ARActivity extends AppCompatActivity
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
     private static final long MIN_TIME_BW_UPDATES = 0;//1000 * 60 * 1; // 1 minute
 
+    final float radioBuffer = (float) 111;//radio de buffer
+
     private FeatureLayer restaurantes, parqueaderos, hoteles;
     private LayerList layers;
     //obtener posicion
     private Point posicion;
-    private Object[] arregloFeatures;
 
     //AROverlayView arOver = new AROverlayView(getBaseContext());
 
@@ -415,10 +416,6 @@ public class ARActivity extends AppCompatActivity
                 queryParam.setWhereClause("1=1");//clausula de busqueda
                 queryParam.setReturnGeometry(true);
                 queryParam.setOutSpatialReference(SpatialReferences.getWgs84());//referencia espacial del query
-                //queryParam.setSpatialRelationship(QueryParameters.SpatialRelationship.INTERSECTS);//relacion espacial, o la accion que se quiere realizar, en este caso intersectar
-                final float radioBuffer = (float) 300;//radio de buffer
-                //queryParam.setGeometry(GeometryEngine.buffer(posicion,radioBuffer));//geometria con la que se quiere intersectar o hacer la accion
-                //final ListenableFuture<FeatureQueryResult> featureQResult = serviceFT.queryFeaturesAsync(queryParam);//todos los features son cargados
 
                 // set all outfields
                 List<String> outFields = new ArrayList<>();
@@ -435,18 +432,25 @@ public class ARActivity extends AppCompatActivity
 
                             ARPoint arPoint = null;
                             actualizarPunto(location);
+                            Toast.makeText(vistaMapLittle.getContext(),"posicion:"+posicion.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
                             Geometry buffer = GeometryEngine.buffer(posicion,radioBuffer);
 
                             while(iterator.hasNext()){
                                 feat = iterator.next();
+                                //
                                 Point punto = (Point) feat.getGeometry();
+                                Toast.makeText(vistaMapLittle.getContext(),"punto:"+punto.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
+                                //Geometry v = GeometryEngine.project(punto,mapaLittle.getSpatialReference());
+                                //punto = (Point)v;
+                                ///
                                 List<Geometry> puntosIntersec = GeometryEngine.intersections(buffer,punto);
                                 Iterator<Geometry> iterPoint = puntosIntersec.iterator();
                                 Point p;
                                 while(iterPoint.hasNext()){
                                     p=(Point)iterPoint.next();
-                                    GeometryEngine.project(p,mapaLittle.getSpatialReference());
-                                    arPoint = new ARPoint((String) feat.getAttributes().get("nombre"),
+                                    Toast.makeText(vistaMapLittle.getContext(),"p:"+p.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
+                                    //GeometryEngine.project(p,mapaLittle.getSpatialReference());
+                                    arPoint = new ARPoint((String) feat.getAttributes().get("nombre"),(String)feat.getFeatureTable().getFields().get(0).toString(),
                                             p.getY(),p.getX(),2400);
                                     arOverlayView.agregarArPoints(arPoint);
                                 }
@@ -489,8 +493,6 @@ public class ARActivity extends AppCompatActivity
 
         switch (item.getItemId()){
             case R.id.nav_layers:
-
-
         }
         // Handle navigation view item clicks here.
         /*int id = item.getItemId();

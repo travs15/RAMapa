@@ -9,9 +9,11 @@ import android.location.Location;
 public class ARPoint {
     Location location;
     String name;
+    String type;
 
-    public ARPoint(String name, double lat, double lon, double altitude) {
+    public ARPoint(String name,String tipo, double lat, double lon, double altitude) {
         this.name = name;
+        this.type = tipo;
         location = new Location("ARPoint");
         location.setLatitude(lat);
         location.setLongitude(lon);
@@ -24,6 +26,10 @@ public class ARPoint {
 
     public String getName() {
         return name;
+    }
+
+    public String getType(){
+        return type;
     }
 }
 

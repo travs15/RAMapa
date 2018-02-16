@@ -24,6 +24,8 @@ public class AROverlayView extends View {
     private List<ARPoint> arPoints = new ArrayList<ARPoint>();
     private double rangoVision = 2000;
 
+    private boolean flagParqueaderos,flagRestaurantes;
+
 
     public AROverlayView(Context context) {
         super(context);
@@ -60,9 +62,15 @@ public class AROverlayView extends View {
         final int radius = 20;
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(getResources().getColor(R.color.color_parqu_ar));
         paint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.NORMAL));
         paint.setTextSize(60);
+        paint.setColor(getResources().getColor(R.color.color_parqu_ar));
+        if(flagParqueaderos==true){
+            paint.setColor(getResources().getColor(R.color.color_parqu_ar));
+        }else if(flagRestaurantes){
+            paint.setColor(getResources().getColor(R.color.color_res_ar));
+        }
+
 
         for (int i = 0; i < arPoints.size(); i ++) {
             float[] currentLocationInECEF = LocationHelper.WSG84toECEF(currentLocation);
@@ -81,6 +89,19 @@ public class AROverlayView extends View {
                 canvas.drawBitmap(bmp,x- (5*arPoints.get(i).getName().length() / 2),y-70, paint);
                 //canvas.drawCircle(x, y, radius, paint);
                 canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
+
+                /*
+                if(flagParqueaderos==true&&arPoints.get(i).getType().equals("Parqueadero")){
+                    Bitmap bmpPar = BitmapFactory.decodeResource(getResources(), R.mipmap.pin_parqu_ar1);
+                    canvas.drawBitmap(bmp,x- (5*arPoints.get(i).getName().length() / 2),y-70, paint);
+                    //canvas.drawCircle(x, y, radius, paint);
+                    canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
+                }else if(flagRestaurantes==true&&arPoints.get(i).getType().equals("Restaurante")){
+                    Bitmap bmpRes = BitmapFactory.decodeResource(getResources(), R.mipmap.pin_restaurantes_selec);
+                    canvas.drawBitmap(bmp,x- (5*arPoints.get(i).getName().length() / 2),y-70, paint);
+                    //canvas.drawCircle(x, y, radius, paint);
+                    canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
+                }*/
             }
         }
     }
@@ -88,4 +109,18 @@ public class AROverlayView extends View {
     public void agregarArPoints(ARPoint p){
         arPoints.add(p);
     }
+
+    public boolean getFlagParqu(){
+        return flagParqueaderos;
+    }
+
+    public boolean getFlagRest(){
+        return flagRestaurantes;
+    }
+
+    public void setFlagParqueaderos(boolean b){
+        flagParqueaderos = b;
+    }
+
+    public void setFlagRestaurantes(boolean b){flagRestaurantes = b;}
 }
