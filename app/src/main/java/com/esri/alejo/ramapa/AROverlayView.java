@@ -65,11 +65,11 @@ public class AROverlayView extends View {
         paint.setTypeface(Typeface.create(Typeface.DEFAULT_BOLD, Typeface.NORMAL));
         paint.setTextSize(60);
         paint.setColor(getResources().getColor(R.color.color_parqu_ar));
-        if(flagParqueaderos==true){
+        /*if(flagParqueaderos==true){
             paint.setColor(getResources().getColor(R.color.color_parqu_ar));
         }else if(flagRestaurantes){
             paint.setColor(getResources().getColor(R.color.color_res_ar));
-        }
+        }*/
 
 
         for (int i = 0; i < arPoints.size(); i ++) {
@@ -88,6 +88,7 @@ public class AROverlayView extends View {
                 Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.mipmap.pin_parqu_ar1);
                 canvas.drawBitmap(bmp,x- (5*arPoints.get(i).getName().length() / 2),y-70, paint);
                 //canvas.drawCircle(x, y, radius, paint);
+
                 canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
 
                 /*
@@ -108,6 +109,14 @@ public class AROverlayView extends View {
 
     public void agregarArPoints(ARPoint p){
         arPoints.add(p);
+    }
+
+    public List<ARPoint> obtenerArPoints(){
+        return arPoints;
+    }
+
+    public String getNombreLugar(ARPoint arPo){
+        return arPo.getName();
     }
 
     public boolean getFlagParqu(){

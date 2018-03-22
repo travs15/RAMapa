@@ -55,20 +55,32 @@ import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.layers.FeatureLayer;
+import com.esri.arcgisruntime.layers.LayerContent;
+import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedEvent;
 import com.esri.arcgisruntime.loadable.LoadStatusChangedListener;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
+import com.esri.arcgisruntime.mapping.GeoElement;
 import com.esri.arcgisruntime.mapping.LayerList;
 import com.esri.arcgisruntime.mapping.view.BackgroundGrid;
 import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
+import com.esri.arcgisruntime.mapping.view.Graphic;
+import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
 import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode;
+import com.esri.arcgisruntime.tasks.networkanalysis.Route;
+import com.esri.arcgisruntime.tasks.networkanalysis.RouteParameters;
+import com.esri.arcgisruntime.tasks.networkanalysis.RouteResult;
+import com.esri.arcgisruntime.tasks.networkanalysis.RouteTask;
+import com.esri.arcgisruntime.tasks.networkanalysis.Stop;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static com.esri.alejo.ramapa.R.string.url_servicio_ruta;
 
 
 public class ARActivity extends AppCompatActivity
@@ -104,12 +116,16 @@ public class ARActivity extends AppCompatActivity
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
     private static final long MIN_TIME_BW_UPDATES = 0;//1000 * 60 * 1; // 1 minute
 
-    final float radioBuffer = (float) 111;//radio de buffer
+    final float radioBuffer = (float) 300;//radio de buffer//modificar puede ser en radianes
 
     private FeatureLayer restaurantes, parqueaderos, hoteles;
     private LayerList layers;
     //obtener posicion
     private Point posicion;
+
+    RouteTask routeTask;
+    RouteParameters routeParameters;
+    Route rutaResultado;
 
     //AROverlayView arOver = new AROverlayView(getBaseContext());
 
@@ -202,20 +218,112 @@ public class ARActivity extends AppCompatActivity
         // override the onSingleTapConfirmed gesture to handle a single tap on the MapView
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            Toast.makeText(vistaMapLittle.getContext(),"presionado",Toast.LENGTH_LONG).show();
-            /*try {
-                actualizarPunto(location);
-                //puntosCapa(parqueaderos);
-            } catch (ExecutionException e1) {
-                e1.printStackTrace();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }*/
+            // get the screen point where user tapped
+            android.graphics.Point screenPoint = new android.graphics.Point((int) e.getX(), (int) e.getY());
+            final ListenableFuture<List<IdentifyLayerResult>> identifyFuture = super.mMapView.identifyLayersAsync(screenPoint, 5,
+                    false);
 
-            //puntosCapa(parqueaderos);
-            //hacerConsulta(getResources().getString(R.string.URL_capa_parqueaderos));
+            // add a listener to the future
+            identifyFuture.addDoneListener(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // get the identify results from the future - returns when the operation is complete
+                        List<IdentifyLayerResult> identifyLayersResults = identifyFuture.get();
+
+                        // iterate all the layers in the identify result
+                        for (IdentifyLayerResult identifyLayerResult : identifyLayersResults) {
+
+                            // each identified layer should find only one or zero results, when identifying topmost GeoElement only
+                            if (identifyLayerResult.getElements().size() > 0) {
+                                GeoElement topmostElement = identifyLayerResult.getElements().get(0);
+                                if (topmostElement instanceof Feature) {
+                                    Feature identifiedFeature = (Feature)topmostElement;
+
+                                    // Use feature as required, for example access attributes or geometry, select, build a table, etc...
+                                    processIdentifyFeatureResult(identifiedFeature, identifyLayerResult.getLayerContent());
+                                }
+                            }
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        //dealWithException(ex); // must deal with exceptions thrown from the async identify operation
+                    }
+                }
+            });
             return super.onSingleTapConfirmed(e);
         }
+    }
+
+    private void processIdentifyFeatureResult(Feature feature, LayerContent content){
+        String nombre = "", direccion = "", foto = "";
+        switch (content.getName()){
+            case "Bancos":
+                nombre = (String) feature.getAttributes().get("Banco");
+                break;
+            case "Parqueaderos":
+                Toast.makeText(this,"parqu",Toast.LENGTH_LONG).show();
+                nombre = (String) feature.getAttributes().get("Nombre");
+                List<ARPoint> lista = arOverlayView.obtenerArPoints();
+                for(int i=0;i<=lista.size() ;i++){
+                    ARPoint punto = lista.get(i);
+                    String nombreFeature = arOverlayView.getNombreLugar(punto);
+                    Toast.makeText(this,nombreFeature,Toast.LENGTH_LONG).show();
+                    if(nombreFeature.equals(nombre)){
+                        Toast.makeText(this,nombre,Toast.LENGTH_LONG).show();
+                        Point p = new Point(punto.getLocation().getLatitude()
+                                ,punto.getLocation().getLongitude(),mapaLittle.getSpatialReference());
+                        encontrarRuta(p);
+                        Toast.makeText(this,"ruta encontrada",Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            case "Restaurantes":
+                nombre = (String) feature.getAttributes().get("Restaurante");
+                break;
+        }
+    }
+
+    //encontrar ruta desde la posicion actual al punto seleccionado
+    private void encontrarRuta(final Point destino ){
+        final String routeTaskService = getResources().getString(R.string.url_servicio_ruta);
+        // create route task from San Diego service
+        routeTask = new RouteTask(this,routeTaskService);
+        // load route task
+        routeTask.loadAsync();
+        routeTask.addDoneLoadingListener(new Runnable() {
+            @Override
+            public void run() {
+                if (routeTask.getLoadError() == null && routeTask.getLoadStatus() == LoadStatus.LOADED) {
+                    // route task has loaded successfully
+                    try {
+                        // get default route parameters
+                        routeParameters = routeTask.createDefaultParametersAsync().get();
+                        // set flags to return stops and directions
+                        routeParameters.setReturnStops(true);
+                        routeParameters.setReturnDirections(true);
+                        //crea una lista de paradas, y las agrega
+                        List routeStops = routeParameters.getStops();
+                        routeStops.add(new Stop(posicion));
+                        routeStops.add(new Stop(destino));
+                        //calcula el resultado de la ruta
+                        RouteResult resultadoRuta = routeTask.solveRouteAsync(routeParameters).get();
+                        //obtiene la lista de las rutas obtenidas
+                        List routes = resultadoRuta.getRoutes();
+                        //obtiene la primera ruta que resulta
+                        rutaResultado = (Route) routes.get(0);
+
+                        resultadoRuta.getPointBarriers();
+
+                        //representa graficamente la ruta
+
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -400,6 +508,7 @@ public class ARActivity extends AppCompatActivity
        //posicion = (Point)xx;
     }
 
+    //hacer consulta para obtener puntos de capa segun el buffer que se hace para representar puntos en AR
     public void hacerConsulta(String urlCapa) {
         try{
         //final ServiceFeatureTable serviceFT = new ServiceFeatureTable(this.getResources().getString(R.string.URL_mapa_alrededores));
@@ -416,7 +525,7 @@ public class ARActivity extends AppCompatActivity
                 queryParam.setWhereClause("1=1");//clausula de busqueda
                 queryParam.setReturnGeometry(true);
                 queryParam.setOutSpatialReference(SpatialReferences.getWgs84());//referencia espacial del query
-
+                //queryParam.setOutSpatialReference(mapaLittle.getSpatialReference());
                 // set all outfields
                 List<String> outFields = new ArrayList<>();
                 outFields.add("*");
@@ -432,14 +541,14 @@ public class ARActivity extends AppCompatActivity
 
                             ARPoint arPoint = null;
                             actualizarPunto(location);
-                            Toast.makeText(vistaMapLittle.getContext(),"posicion:"+posicion.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
+                            //Toast.makeText(vistaMapLittle.getContext(),"posicion:"+posicion.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
                             Geometry buffer = GeometryEngine.buffer(posicion,radioBuffer);
 
                             while(iterator.hasNext()){
                                 feat = iterator.next();
                                 //
                                 Point punto = (Point) feat.getGeometry();
-                                Toast.makeText(vistaMapLittle.getContext(),"punto:"+punto.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
+                                //Toast.makeText(vistaMapLittle.getContext(),"punto:"+punto.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
                                 //Geometry v = GeometryEngine.project(punto,mapaLittle.getSpatialReference());
                                 //punto = (Point)v;
                                 ///
@@ -448,9 +557,9 @@ public class ARActivity extends AppCompatActivity
                                 Point p;
                                 while(iterPoint.hasNext()){
                                     p=(Point)iterPoint.next();
-                                    Toast.makeText(vistaMapLittle.getContext(),"p:"+p.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
-                                    //GeometryEngine.project(p,mapaLittle.getSpatialReference());
-                                    arPoint = new ARPoint((String) feat.getAttributes().get("nombre"),(String)feat.getFeatureTable().getFields().get(0).toString(),
+                                    //Toast.makeText(vistaMapLittle.getContext(),"p:"+p.getSpatialReference().toString(),Toast.LENGTH_LONG).show();
+                                    GeometryEngine.project(p,mapaLittle.getSpatialReference());
+                                    arPoint = new ARPoint((String) feat.getAttributes().get("nombre"),
                                             p.getY(),p.getX(),2400);
                                     arOverlayView.agregarArPoints(arPoint);
                                 }

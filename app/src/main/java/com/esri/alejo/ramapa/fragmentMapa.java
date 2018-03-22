@@ -308,11 +308,11 @@ public class fragmentMapa extends Fragment implements View.OnClickListener,Seria
     private void processIdentifyFeatureResult(Feature feature, LayerContent content){
         String nombre = "", direccion = "", foto = "";
         switch (content.getName()){
-            case "Hoteles":
+            case "Bancos":
                 nombre = (String) feature.getAttributes().get("Hotel");
                 direccion = (String) feature.getAttributes().get("Direccion");
                 foto = (String) feature.getAttributes().get("Foto");
-                mostrarPopup("Hotel", nombre, direccion, foto);
+                mostrarPopup("Banco", nombre, direccion, foto);
                 break;
             case "Parqueaderos":
                 nombre = (String) feature.getAttributes().get("Nombre");

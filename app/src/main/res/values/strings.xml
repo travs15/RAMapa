@@ -12,6 +12,8 @@
     <string name="map_search_placeholder">Ejemplo,  calle 90 13 40 Bogotá</string>
     <string name="title_activity_ar">ARActivity</string>
 
+    <string name="url_servicio_ruta">http://sampleserver6.arcgisonline.com/arcgis/rest/services/NetworkAnalysis/SanDiego/NAServer/Route</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
